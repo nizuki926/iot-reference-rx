@@ -309,7 +309,7 @@ BaseType_t KVStore_xCommitChanges( void )
         	/*
         	 * Check if certificate or privatekey or publickey
         	 */
-        	if ((i  == KVS_DEVICE_CERT_ID ) || (i  == KVS_DEVICE_PRIVKEY_ID )|| (i  == KVS_DEVICE_PUBKEY_ID ))
+        	if ((i  == KVS_DEVICE_CERT_ID ) || (i  == KVS_DEVICE_PRIVKEY_ID )|| (i  == KVS_DEVICE_PUBKEY_ID ) || (i  == KVS_UPDATE_DEVICE_CERT_ID ) || (i  == KVS_UPDATE_DEVICE_PRIVKEY_ID )|| (i  == KVS_UPDATE_DEVICE_PUBKEY_ID ))
 			{
 				xSuccess = vDevModeKeyPreProvisioning(gKeyValueStore, (KVStoreKey_t)i,gKeyValueStore.table[ i ].valueLength);
 				if (xSuccess == pdFALSE)
@@ -486,7 +486,7 @@ int32_t vprvCacheInit( void )
     {
         /* pvData pointer should be NULL on startup */
 
-    	if ((i  == KVS_DEVICE_CERT_ID ) || (i  == KVS_DEVICE_PRIVKEY_ID ) || (i  == KVS_DEVICE_PUBKEY_ID ) || (i  == KVS_CLAIM_CERT_ID )|| (i  == KVS_CLAIM_PRIVKEY_ID ))
+    	if ((i  == KVS_DEVICE_CERT_ID ) || (i  == KVS_DEVICE_PRIVKEY_ID ) || (i  == KVS_DEVICE_PUBKEY_ID ) || (i  == KVS_CLAIM_CERT_ID )|| (i  == KVS_CLAIM_PRIVKEY_ID ) || (i  == KVS_UPDATE_DEVICE_CERT_ID ) || (i  == KVS_UPDATE_DEVICE_PRIVKEY_ID )|| (i  == KVS_UPDATE_DEVICE_PUBKEY_ID ))
     	{
     		continue;
     	}
@@ -595,6 +595,9 @@ char *xprvGetCacheEntry(char* key, size_t pxLength )
 	const char pxPubKeyLabel[] =  pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS ;
 	const char pxClaimCert[] =  pkcs11configLABEL_CLAIM_CERTIFICATE ;
     const char pxClaimKey[] =  pkcs11configLABEL_CLAIM_PRIVATE_KEY ;
+    const char pxUpdateCertLabel[] =  pkcs11configLABEL_UPDATE_DEVICE_CERTIFICATE_FOR_TLS ;
+    const char pxUpdatePrivKeyLabel[] =  pkcs11configLABEL_UPDATE_DEVICE_PRIVATE_KEY_FOR_TLS ;
+    const char pxUpdatePubKeyLabel[] =  pkcs11configLABEL_UPDATE_DEVICE_PUBLIC_KEY_FOR_TLS ;
 	CK_FUNCTION_LIST_PTR pxFunctionList = NULL;
 	CK_SESSION_HANDLE xSession = 0;
     char *client_private_key, *client_certificate;
@@ -706,6 +709,51 @@ char *xprvGetCacheEntry(char* key, size_t pxLength )
             }
         }
     }
+    else if (xKey == KVS_UPDATE_DEVICE_CERT_ID)
+    {
+        xIsPrivate = (CK_BBOOL ) CK_TRUE;
+        xPalHandle = PKCS11_PAL_FindObject (pxUpdateCertLabel, strlen(pxUpdateCertLabel));
+        if (xPalHandle != CK_INVALID_HANDLE)
+        {
+            xResult = PKCS11_PAL_GetObjectValue (xPalHandle, &tmp, &data_length, &xIsPrivate);
+            if ((xResult == CKR_OK) && (data_length > 0))
+            {
+                vAllocateDataBuffer (xKey, data_length);
+                strcpy(gKeyValueStore.table[xKey].key, keys[xKey]);
+                gKeyValueStore.table[xKey].value = tmp;
+            }
+        }
+    }
+    else if (xKey == KVS_UPDATE_DEVICE_PRIVKEY_ID)
+    {
+        xIsPrivate = (CK_BBOOL ) CK_TRUE;
+        xPalHandle = PKCS11_PAL_FindObject (pxUpdatePrivKeyLabel, strlen(pxUpdatePrivKeyLabel));
+        if (xPalHandle != CK_INVALID_HANDLE)
+        {
+            xResult = PKCS11_PAL_GetObjectValue (xPalHandle, &tmp, &data_length, &xIsPrivate);
+            if ((xResult == CKR_OK) && (data_length > 0))
+            {
+                vAllocateDataBuffer (xKey, data_length);
+                strcpy(gKeyValueStore.table[xKey].key, keys[xKey]);
+                gKeyValueStore.table[xKey].value = tmp;
+            }
+        }
+    }
+    else if (xKey == KVS_UPDATE_DEVICE_PUBKEY_ID)
+    {
+        xIsPrivate = (CK_BBOOL ) CK_TRUE;
+        xPalHandle = PKCS11_PAL_FindObject (pxUpdatePubKeyLabel, strlen(pxUpdatePubKeyLabel));
+        if (xPalHandle != CK_INVALID_HANDLE)
+        {
+            xResult = PKCS11_PAL_GetObjectValue (xPalHandle, &tmp, &data_length, &xIsPrivate);
+            if ((xResult == CKR_OK) && (data_length > 0))
+            {
+                vAllocateDataBuffer (xKey, data_length);
+                strcpy(gKeyValueStore.table[xKey].key, keys[xKey]);
+                gKeyValueStore.table[xKey].value = tmp;
+            }
+        }
+    }
 	else
 	{
 		xNvLength = xprvGetValueLengthFromImpl( xKey );
@@ -722,7 +770,7 @@ char *xprvGetCacheEntry(char* key, size_t pxLength )
 
 
 	if ((xKey == KVS_DEVICE_CERT_ID) || (xKey == KVS_DEVICE_PRIVKEY_ID) || (xKey == KVS_DEVICE_PUBKEY_ID)
-            || (xKey == KVS_CLAIM_CERT_ID) || (xKey == KVS_CLAIM_PRIVKEY_ID))
+            || (xKey == KVS_CLAIM_CERT_ID) || (xKey == KVS_CLAIM_PRIVKEY_ID) || (xKey  == KVS_UPDATE_DEVICE_CERT_ID ) || (xKey  == KVS_UPDATE_DEVICE_PRIVKEY_ID )|| (xKey  == KVS_UPDATE_DEVICE_PUBKEY_ID ))
     {
         if (data_length > 0)
         {

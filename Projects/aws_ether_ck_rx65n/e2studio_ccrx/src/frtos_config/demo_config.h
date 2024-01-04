@@ -77,8 +77,9 @@
 /* Please select a provisioning method
  * (0) : Pre-provisioning
  * (1) : Fleet provisioning
+ * (2) : Update Certificate
  */
-#define ENABLE_FLEET_PROVISIONING_DEMO      (0)
+#define ENABLE_FLEET_PROVISIONING_DEMO      (2)
 
 /* Please select whether to enable or disable the OTA demo
  * (0) : OTA demo is disabled

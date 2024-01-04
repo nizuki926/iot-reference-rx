@@ -101,6 +101,9 @@
 
 #include "store.h"
 
+/* Interface include. */
+#include "pkcs11_operations.h"
+
 #ifndef democonfigMQTT_BROKER_ENDPOINT
     #define democonfigMQTT_BROKER_ENDPOINT    clientcredentialMQTT_BROKER_ENDPOINT
 #endif
@@ -559,6 +562,11 @@ static BaseType_t prvCreateTLSConnection( NetworkContext_t * pxNetworkContext )
     BackoffAlgorithmContext_t xReconnectParams = { 0 };
     uint16_t usNextRetryBackOff = 0U;
 
+    CK_SESSION_HANDLE xP11Session;
+    CK_RV xPkcs11Ret = CKR_OK;
+    CK_OBJECT_HANDLE xClientCertificate;
+    CK_OBJECT_HANDLE xPrivateKey;
+
 #ifdef democonfigUSE_AWS_IOT_CORE_BROKER
 
     /* ALPN protocols must be a NULL-terminated list of strings. Therefore,
@@ -578,9 +586,38 @@ static BaseType_t prvCreateTLSConnection( NetworkContext_t * pxNetworkContext )
     /* Set the credentials for establishing a TLS connection. */
     xNetworkCredentials.pRootCa = ( const unsigned char * ) pcRootCA;
     xNetworkCredentials.rootCaSize = strlen( pcRootCA ) + 1;
-    xNetworkCredentials.pClientCertLabel = pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS;
-    xNetworkCredentials.pPrivateKeyLabel = pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS;
 
+    /* Initialize the PKCS #11 module */
+    xPkcs11Ret = xInitializePkcs11Session( &xP11Session );
+    if( xPkcs11Ret != CKR_OK )
+    {
+        LogError( ( "Failed to initialize PKCS #11." ) );
+    }
+    else
+    {
+        xPkcs11Ret = xGetCertificateAndKeyState( xP11Session,
+                                                 &xClientCertificate,
+                                                 &xPrivateKey );
+
+        if ( (xPkcs11Ret == CKR_OK) && ((xClientCertificate == CK_INVALID_HANDLE) || (xPrivateKey == CK_INVALID_HANDLE)) )
+        {
+            LogInfo( ( "Using first device certificate and key" ) );
+            xNetworkCredentials.pClientCertLabel = pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS;
+            xNetworkCredentials.pPrivateKeyLabel = pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS;
+        }
+        else if ( (xPkcs11Ret == CKR_OK) && ((xClientCertificate != CK_INVALID_HANDLE) && (xPrivateKey != CK_INVALID_HANDLE)) )
+        {
+            LogInfo( ( "Using updated device certificate and key" ) );
+            xNetworkCredentials.pClientCertLabel = pkcs11configLABEL_UPDATE_DEVICE_CERTIFICATE_FOR_TLS;
+            xNetworkCredentials.pPrivateKeyLabel = pkcs11configLABEL_UPDATE_DEVICE_PRIVATE_KEY_FOR_TLS;
+        }
+        else
+        {
+            LogError( ( "Failed to get state." ) );
+        }
+    }
+
+    xPkcs11CloseSession( xP11Session );
 
     xNetworkCredentials.disableSni = democonfigDISABLE_SNI;
     BackoffAlgorithm_InitializeParams( &xReconnectParams,

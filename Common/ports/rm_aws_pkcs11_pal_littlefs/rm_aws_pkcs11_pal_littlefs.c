@@ -74,6 +74,15 @@ enum eObjectHandles
 #if pkcs11configMAX_NUM_OBJECTS >= 9
     eAwsJitpCertificate,
 #endif
+#if pkcs11configMAX_NUM_OBJECTS >= 10
+    eAwsUpdateDevicePrivateKey,
+#endif
+#if pkcs11configMAX_NUM_OBJECTS >= 11
+    eAwsUpdateDevicePublicKey,
+#endif
+#if pkcs11configMAX_NUM_OBJECTS >= 12
+    eAwsUpdateDeviceCertificate,
+#endif
 };
 
 uint8_t g_object_handle_dictionary[pkcs11configMAX_NUM_OBJECTS][pkcs11configMAX_LABEL_LENGTH + 1] =
@@ -90,6 +99,15 @@ uint8_t g_object_handle_dictionary[pkcs11configMAX_NUM_OBJECTS][pkcs11configMAX_
 #endif
 #if pkcs11configMAX_NUM_OBJECTS >= 9
     pkcs11configLABEL_JITP_CERTIFICATE,
+#endif
+#if pkcs11configMAX_NUM_OBJECTS >= 10
+    pkcs11configLABEL_UPDATE_DEVICE_PRIVATE_KEY_FOR_TLS,
+#endif
+#if pkcs11configMAX_NUM_OBJECTS >= 11
+    pkcs11configLABEL_UPDATE_DEVICE_PUBLIC_KEY_FOR_TLS,
+#endif
+#if pkcs11configMAX_NUM_OBJECTS >= 12
+    pkcs11configLABEL_UPDATE_DEVICE_CERTIFICATE_FOR_TLS,
 #endif
 };
 TlsTransportStatus_t Crypto( void );
@@ -278,7 +296,7 @@ CK_RV PKCS11_PAL_GetObjectValue (CK_OBJECT_HANDLE xHandle,
                 xReturn = CKR_OK;
             }
 
-            if (xHandle == eAwsDevicePrivateKey || xHandle == eAwsClaimPrivateKey)
+            if (xHandle == eAwsDevicePrivateKey || xHandle == eAwsClaimPrivateKey || xHandle == eAwsUpdateDevicePrivateKey)
             {
                 *pIsPrivate = CK_TRUE;
             }

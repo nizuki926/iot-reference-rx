@@ -58,6 +58,10 @@ extern void vStartSimplePubSubDemo( void  );
     extern void vStartFleetProvisioningDemo(void);
 #endif
 
+#if (ENABLE_FLEET_PROVISIONING_DEMO == 2)
+    vStartUpdateCertificateDemo(void);
+#endif
+
 /**
  * @brief Flag which enables OTA update task in background along with other demo tasks.
  * OTA update task polls regularly for firmware update jobs or acts on a new firmware update
@@ -174,6 +178,8 @@ void main_task( void )
 
         #if (ENABLE_FLEET_PROVISIONING_DEMO == 1)
            vStartFleetProvisioningDemo();
+        #elif (ENABLE_FLEET_PROVISIONING_DEMO == 2)
+           vStartUpdateCertificateDemo();
         #else
            xSetMQTTAgentState( MQTT_AGENT_STATE_INITIALIZED );
         #endif

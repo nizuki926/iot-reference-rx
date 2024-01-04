@@ -57,6 +57,9 @@ typedef enum KVStoreKey
 	KVS_CLAIM_CERT_ID,
 	KVS_CLAIM_PRIVKEY_ID,
     KVS_CODE_SIGN_CERT_ID,
+    KVS_UPDATE_DEVICE_CERT_ID,
+    KVS_UPDATE_DEVICE_PRIVKEY_ID,
+    KVS_UPDATE_DEVICE_PUBKEY_ID,
     KVS_NUM_KEYS
 } KVStoreKey_t;
 
@@ -88,6 +91,9 @@ typedef struct KeyValueStore
 		[ KVS_CLAIM_CERT_ID ] = pkcs11configLABEL_CLAIM_CERTIFICATE,         \
 		[ KVS_CLAIM_PRIVKEY_ID ] = pkcs11configLABEL_CLAIM_PRIVATE_KEY,         \
 		[ KVS_CODE_SIGN_CERT_ID ] = "code_sign_cert_id",         \
+		[ KVS_UPDATE_DEVICE_CERT_ID ] = pkcs11configLABEL_UPDATE_DEVICE_CERTIFICATE_FOR_TLS,         \
+		[ KVS_UPDATE_DEVICE_PRIVKEY_ID ] = pkcs11configLABEL_UPDATE_DEVICE_PRIVATE_KEY_FOR_TLS,         \
+		[ KVS_UPDATE_DEVICE_PUBKEY_ID ] = pkcs11configLABEL_UPDATE_DEVICE_PUBLIC_KEY_FOR_TLS,         \
     }
 #define CLICMDKEYS                                       \
     {                                                      \
@@ -101,6 +107,9 @@ typedef struct KeyValueStore
 		[ KVS_CLAIM_CERT_ID ] = "claimcert",                \
 		[ KVS_CLAIM_PRIVKEY_ID ] = "claimkey",         \
         [ KVS_CODE_SIGN_CERT_ID ] = "codesigncert",         \
+        [ KVS_UPDATE_DEVICE_CERT_ID ] = "updatecert",         \
+        [ KVS_UPDATE_DEVICE_PRIVKEY_ID ] = "updatekey",         \
+        [ KVS_UPDATE_DEVICE_PUBKEY_ID ] = "updatepub",         \
     }
 typedef enum KVStoreKeytype
 {

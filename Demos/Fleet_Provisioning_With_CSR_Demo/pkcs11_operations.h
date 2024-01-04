@@ -48,6 +48,20 @@ CK_RV xGetCertificateAndKeyState( CK_SESSION_HANDLE xP11Session,
                                   CK_OBJECT_HANDLE_PTR pxClientCertificate,
                                   CK_OBJECT_HANDLE_PTR pxPrivateKey );
 
+
+/**
+ * @brief Determine which required client crypto objects are already present in storage.
+ *
+ * @param[in] p11Session The PKCS #11 session to use.
+ * @param[out] object handle for device certificate.
+ * @param[out] object handle for device private key.
+ *
+ * @return CKR_OK if certificate and private key import succeeded. Otherwise, a positive PKCS #11 error code.
+ */
+CK_RV xGetUpdateCertificateAndKeyState( CK_SESSION_HANDLE xP11Session,
+                                  CK_OBJECT_HANDLE_PTR pxClientCertificate,
+                                  CK_OBJECT_HANDLE_PTR pxPrivateKey );
+
 /**
  * @brief Destroy the required client crypto object.
  *

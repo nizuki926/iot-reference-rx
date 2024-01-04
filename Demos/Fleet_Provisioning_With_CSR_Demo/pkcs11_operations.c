@@ -904,6 +904,39 @@ CK_RV xGetCertificateAndKeyState( CK_SESSION_HANDLE xP11Session,
 }
 /*-----------------------------------------------------------*/
 
+CK_RV xGetUpdateCertificateAndKeyState( CK_SESSION_HANDLE xP11Session,
+                                  CK_OBJECT_HANDLE_PTR pxClientCertificate,
+                                  CK_OBJECT_HANDLE_PTR pxPrivateKey )
+{
+    CK_RV xResult;
+    CK_FUNCTION_LIST_PTR pxFunctionList;
+
+    xResult = C_GetFunctionList( &pxFunctionList );
+
+    /* Check for a private key. */
+    if( CKR_OK == xResult )
+    {
+        xResult = xFindObjectWithLabelAndClass( xP11Session,
+                                                pkcs11configLABEL_UPDATE_DEVICE_PRIVATE_KEY_FOR_TLS,
+                                                sizeof( pkcs11configLABEL_UPDATE_DEVICE_PRIVATE_KEY_FOR_TLS ) - 1,
+                                                CKO_PRIVATE_KEY,
+                                                pxPrivateKey );
+    }
+
+    /* Check for the client certificate. */
+    if( CKR_OK == xResult )
+    {
+        xResult = xFindObjectWithLabelAndClass( xP11Session,
+                                                pkcs11configLABEL_UPDATE_DEVICE_CERTIFICATE_FOR_TLS,
+                                                sizeof( pkcs11configLABEL_UPDATE_DEVICE_CERTIFICATE_FOR_TLS ) - 1,
+                                                CKO_CERTIFICATE,
+                                                pxClientCertificate );
+    }
+
+    return xResult;
+}
+/*-----------------------------------------------------------*/
+
 CK_RV xDestroyCertificateAndKey( CK_SESSION_HANDLE xP11Session)
 {
     CK_RV xResult;

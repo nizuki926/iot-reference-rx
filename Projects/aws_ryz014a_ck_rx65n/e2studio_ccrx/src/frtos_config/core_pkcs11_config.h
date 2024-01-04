@@ -73,7 +73,7 @@
 * <b>Possible values:</b> Any positive integer.<br>
 * <b>Default value:</b> 10
 */
-#define pkcs11configMAX_NUM_OBJECTS    8
+#define pkcs11configMAX_NUM_OBJECTS    12
 
 /**
 * @brief Set to 1 if a PAL destroy object is implemented.
@@ -96,6 +96,12 @@
 * <b>Default value:</b> `0`
 */
 #define pkcs11configOTA_SUPPORTED    1
+
+#define pkcs11configLABEL_UPDATE_DEVICE_PRIVATE_KEY_FOR_TLS    "Update Device Priv TLS Key"
+
+#define pkcs11configLABEL_UPDATE_DEVICE_PUBLIC_KEY_FOR_TLS    "Update Device Pub TLS Key"
+
+#define pkcs11configLABEL_UPDATE_DEVICE_CERTIFICATE_FOR_TLS    "Update Device Cert"
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
