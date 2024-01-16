@@ -58,6 +58,10 @@ extern void vStartSimplePubSubDemo( void  );
     extern void vStartFleetProvisioningDemo(void);
 #endif
 
+#if (ENABLE_DEVICE_LOCATION_DEMO == 1)
+    extern void vStartDeviceLocationDemo( void  );
+#endif
+
 /**
  * @brief Flag which enables OTA update task in background along with other demo tasks.
  * OTA update task polls regularly for firmware update jobs or acts on a new firmware update
@@ -103,6 +107,28 @@ extern void vStartSimplePubSubDemo( void  );
 #define mainTEST_RUNNER_TASK_STACK_SIZE    ( configMINIMAL_STACK_SIZE * 8 )
 #define UNSIGNED_SHORT_RANDOM_NUMBER_MASK         (0xFFFFUL)
 
+#define CELLULAR_MCC ( 440 )
+#define CELLULAR_MNC ( 10 )
+
+#define demoDEVICE_LOCATION_JSON    \
+    "{"                             \
+    "\"Ip\": {"                     \
+        "\"IpAddress\": \"%s\""     \
+    "},"                            \
+    "\"CellTowers\": {"             \
+        "\"Lte\": ["                \
+        "{"                         \
+            "\"Mcc\": %d,"          \
+            "\"Mnc\": %d,"          \
+            "\"EutranCid\": %d,"    \
+            "\"Tac\": %d,"          \
+            "}"                     \
+        "]"                         \
+    "}"                             \
+"}"
+
+#define demoDEVICE_LOCATION_JSON_SIZE ( sizeof( demoDEVICE_LOCATION_JSON ) + 128U )
+
 /**
  * @brief Application task startup hook.
  */
@@ -112,6 +138,8 @@ void vApplicationDaemonTaskStartupHook( void );
  * @brief Initializes the board.
  */
 void prvMiscInitialization( void );
+
+int vGetDeviceLocationInfo( char * buffer);
 
 extern void UserInitialization(void);
 extern void CLI_Support_Settings(void);
@@ -180,7 +208,11 @@ void main_task( void )
 
         vStartMQTTAgent (appmainMQTT_AGENT_TASK_STACK_SIZE, appmainMQTT_AGENT_TASK_PRIORITY);
 
+#if (ENABLE_DEVICE_LOCATION_DEMO == 0)
         vStartSimplePubSubDemo ();
+#else
+        vStartDeviceLocationDemo ();
+#endif
 
         #if (ENABLE_OTA_UPDATE_DEMO == 1)
                   vStartOtaDemo();
@@ -377,4 +409,25 @@ signed char vISR_Routine( void )
 	BaseType_t xTaskWokenByReceive = pdFALSE;
 	extern signed char cRxedChar;
     return cRxedChar;
+}
+
+int vGetDeviceLocationInfo( char * buffer)
+{
+    e_cellular_err_t cell_ret;
+    st_cellular_notice_t cellular_notice = {0};
+    st_cellular_ipaddr_t ip_addr;
+
+    cell_ret = R_CELLULAR_GetAPConnectState(&cellular_ctrl, CELLULAR_DISABLE_NETWORK_RESULT_CODE, &cellular_notice);
+    if (CELLULAR_SUCCESS != cell_ret)
+    {
+        return -1;
+    }
+
+    cell_ret = R_CELLULAR_GetPDPAddress(&cellular_ctrl, &ip_addr);
+    if (CELLULAR_SUCCESS != cell_ret)
+    {
+        return -1;
+    }
+
+    return snprintf(buffer, demoDEVICE_LOCATION_JSON_SIZE, demoDEVICE_LOCATION_JSON, ip_addr.ipv4, CELLULAR_MCC, CELLULAR_MNC, strtol( cellular_notice.cell_id, NULL, 16 ), strtol( cellular_notice.ta_code, NULL, 16 ) );
 }

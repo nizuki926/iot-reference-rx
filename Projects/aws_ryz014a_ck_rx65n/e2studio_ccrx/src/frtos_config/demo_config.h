@@ -86,6 +86,12 @@
  */
 #define ENABLE_OTA_UPDATE_DEMO              (0)
 
+/* Please select whether to enable or disable the device location demo
+ * (0) : device location demo is disabled
+ * (1) : device location demo is enabled
+ */
+#define ENABLE_DEVICE_LOCATION_DEMO         (1)
+
 //#if ENABLE_OTA_UPDATE_DEMO
 //#error "OTA demo is not support in this release"
 //#endif
