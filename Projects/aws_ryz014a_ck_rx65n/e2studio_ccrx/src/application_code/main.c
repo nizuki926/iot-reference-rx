@@ -121,7 +121,7 @@ extern void vStartSimplePubSubDemo( void  );
             "\"Mcc\": %d,"          \
             "\"Mnc\": %d,"          \
             "\"EutranCid\": %d,"    \
-            "\"Tac\": %d,"          \
+            "\"Tac\": %d"           \
             "}"                     \
         "]"                         \
     "}"                             \
@@ -417,7 +417,7 @@ int vGetDeviceLocationInfo( char * buffer)
     st_cellular_notice_t cellular_notice = {0};
     st_cellular_ipaddr_t ip_addr;
 
-    cell_ret = R_CELLULAR_GetAPConnectState(&cellular_ctrl, CELLULAR_DISABLE_NETWORK_RESULT_CODE, &cellular_notice);
+    cell_ret = R_CELLULAR_GetAPConnectState(&cellular_ctrl, CELLULAR_ENABLE_NETWORK_RESULT_CODE_LEVEL2, &cellular_notice);
     if (CELLULAR_SUCCESS != cell_ret)
     {
         return -1;
